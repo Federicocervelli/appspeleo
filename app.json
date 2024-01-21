@@ -1,13 +1,51 @@
 {
   "expo": {
-    "scheme": "acme",
+    "name": "appluca",
+    "slug": "appluca",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "userInterfaceStyle": "automatic"
+    },
+    "android": {
+      "package": "com.mpixl.appspeleo",
+      "softwareKeyboardLayoutMode" : "pan",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "userInterfaceStyle": "automatic"
+    },
     "web": {
-      "bundler": "metro"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
     ],
-    "name": "appluca",
-    "slug": "appluca"
+    "extra": {
+      "eas": {
+        "projectId": "8fc1613b-a7ba-4ab2-bb32-ab9300b305c4"
+      }
+    }
   }
 }
