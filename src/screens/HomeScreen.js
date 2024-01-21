@@ -16,7 +16,7 @@ import { Picker } from '@react-native-picker/picker';
 
 export default function HomeScreen() {
   const [showDropDownSpesa, setShowDropDownSpesa] = useState(false);
-  const [spesante, setSpesante] = useState("");
+  const [utente, setUtente] = useState("");
   const [showDropDownFondi, setShowDropDownFondi] = useState(false);
   const [fondi, setFondi] = useState("");
   const [date, setDate] = useState(new Date());
@@ -85,14 +85,14 @@ export default function HomeScreen() {
 
   const handleAggiungiClick = async () => {
     let errori = [];
-    //check if there is a date, spesante, fondi, and costo, if not, give error, if yes, console log everything
+    //check if there is a date, utente, fondi, and costo, if not, give error, if yes, console log everything
     if (date == null) {
       errori.push("data");
-    } 
-    if (spesante == "") {
-      errori.push("spesante");
     }
-    if (spesante !== "gruppospeleo" && fondi == "") {
+    if (utente == "") {
+      errori.push("utente");
+    }
+    if (utente !== "gruppospeleo" && fondi == "") {
       errori.push("fondi");
     }
     if (costo == 0) {
@@ -101,66 +101,8 @@ export default function HomeScreen() {
     if (descrizione == "") {
       errori.push("descrizione");
     }
-    if (errori.length === 0) {
-      setLoadingAggiungi(true);
-      const requestBody = {
-        data: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
-        spesante: spesante,
-        tipo_di_fondi_utilizzati: fondi,
-        descrizione: descrizione || "Nessuna descrizione",
-        costo: costo,
-        immagini: selectedImages || [], // Use an empty array if no images are selected
-      };
-      try {
-        // Send the POST request
-        const response = await fetch('https://appluca-backend.federicocervelli01.workers.dev/spese', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (response.ok) {
-          // Handle success (you may want to update UI or navigate to another screen)
-          console.log('Spesa added successfully!');
-          toast.show("Spesa aggiunta con successo", {
-            type: "success_custom",
-            placement: "top",
-            duration: 3000,
-            animationType: "slide-in",
-            data: {
-              title: "Successo"
-            }
-          });
-        } else {
-          // Handle error
-          console.error('Failed to add spesa:', response.statusText);
-          toast.show("Errore durante l'aggiunta della spesa", {
-            type: "error_custom",
-            placement: "top",
-            duration: 3000,
-            animationType: "slide-in",
-            data: {
-              title: "Errore"
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        toast.show("Errore durante l'aggiunta della spesa", {
-          type: "error_custom",
-          placement: "top",
-          duration: 3000,
-          animationType: "slide-in",
-          data: {
-            title: "Errore"
-          }
-        });
-      } finally {
-        setLoadingAggiungi(false);
-      }
-    } else {
+    
+    if (errori.length > 0) {
       toast.show("Compila " + errori.join(", ") + " per aggiungere la spesa", {
         type: "warning_custom",
         placement: "top",
@@ -170,7 +112,69 @@ export default function HomeScreen() {
           title: "Attenzione"
         }
       });
+      return console.log("Compila " + errori.join(", ") + " per aggiungere la spesa");
     }
+
+    setLoadingAggiungi(true);
+
+    const requestBody = {
+      data: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
+      utente: utente,
+      tipo_fondi: fondi,
+      descrizione: descrizione || "Nessuna descrizione",
+      quantità: costo,
+      immagini: selectedImages || [], // Use an empty array if no images are selected
+    };
+    try {
+      // Send the POST request
+      const response = await fetch('https://appluca-backend.federicocervelli01.workers.dev/spese', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        // Handle success (you may want to update UI or navigate to another screen)
+        console.log('Spesa added successfully!');
+        toast.show("Spesa aggiunta con successo", {
+          type: "success_custom",
+          placement: "top",
+          duration: 3000,
+          animationType: "slide-in",
+          data: {
+            title: "Successo"
+          }
+        });
+      } else {
+        // Handle error
+        console.error('Failed to add spesa:', await response.text());
+        toast.show("Errore durante l'aggiunta della spesa", {
+          type: "error_custom",
+          placement: "top",
+          duration: 3000,
+          animationType: "slide-in",
+          data: {
+            title: "Errore"
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.show("Errore durante l'aggiunta della spesa", {
+        type: "error_custom",
+        placement: "top",
+        duration: 3000,
+        animationType: "slide-in",
+        data: {
+          title: "Errore"
+        }
+      });
+    } finally {
+      setLoadingAggiungi(false);
+    }
+
   }
 
   const onDismissDate = React.useCallback(() => {
@@ -192,17 +196,18 @@ export default function HomeScreen() {
       value: "default",
     },
     {
-      label: "Luca",
-      value: "luca",
-    },
-    {
-      label: "Andrea",
-      value: "andrea",
-    },
-    {
       label: "Gruppo Speleo",
-      value: "gruppospeleo",
+      value: "Gruppo Speleo",
     },
+    {
+      label: "Luca Morgantini",
+      value: "Luca Morgantini",
+    },
+    {
+      label: "Andrea Rossi",
+      value: "Andrea Rossi",
+    },
+    
   ];
   const fondiList = [
     {
@@ -230,148 +235,148 @@ export default function HomeScreen() {
 
 
   return (
-      <Surface className="flex-1" style={{ backgroundColor: theme.dark ? 'black' : theme.colors.background }}>
-        <SafeAreaView className="flex-1 m-10 mt-20">
-          <TextInput
+    <Surface className="flex-1" style={{ backgroundColor: theme.dark ? 'black' : theme.colors.background }}>
+      <SafeAreaView className="flex-1 m-10 mt-20">
+        <TextInput
 
-            mode="outlined"
-            label={<Text style={{ color: theme.colors.onBackground }}>Data</Text>}
-            value={`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`}
-            editable={false}
-            outlineColor={theme.colors.onBackground}
-            style={{ backgroundColor: theme.colors.background }}
-            placeholderTextColor={theme.colors.onBackground}
-            textColor={theme.colors.onBackground}
-            right={<TextInput.Icon icon="calendar-month" color={theme.colors.onBackground} onPress={showDatepicker} />}
+          mode="outlined"
+          label={<Text style={{ color: theme.colors.onBackground }}>Data</Text>}
+          value={`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`}
+          editable={false}
+          outlineColor={theme.colors.onBackground}
+          style={{ backgroundColor: theme.colors.background }}
+          placeholderTextColor={theme.colors.onBackground}
+          textColor={theme.colors.onBackground}
+          right={<TextInput.Icon icon="calendar-month" color={theme.colors.onBackground} onPress={showDatepicker} />}
+        />
+        {show && (
+          <DateTimePicker
+            value={date}
+            mode={mode}
+            is24Hour={true}
+            onChange={onChange}
           />
-          {show && (
-            <DateTimePicker
-              value={date}
-              mode={mode}
-              is24Hour={true}
-              onChange={onChange}
-            />
-          )}
-          <View className="h-5" />
+        )}
+        <View className="h-5" />
 
-          <View className="overflow-hidden" style={{ borderRadius: 4, borderWidth: 1, borderColor: theme.colors.onBackground }}>
-            <Picker
-              style={{ backgroundColor: theme.colors.background, color: theme.colors.onBackground }}
-              dropdownIconColor={theme.colors.onBackground}
-              dropdownIconRippleColor={theme.colors.onBackground}
-              selectedValue={spesante}
-              onValueChange={(itemValue, itemIndex) => {
-                if (itemIndex !== 0) {
-                  setSpesante(itemValue)
-                }
-              }
-
-              }>
-              {spesantiList.map((item, index) => (
-                index === 0 ? (
-                  <Picker.Item className="bg-black" enabled={false} label={item.label} value={item.value} key={index} />
-                ) : (
-                  <Picker.Item label={item.label} value={item.value} key={index} />
-                )
-              ))}
-            </Picker>
-          </View>
-
-
-          {spesante !== "gruppospeleo" && (<><View className="h-5" /><View className="overflow-hidden" style={{ borderRadius: 4, borderWidth: 1, borderColor: theme.colors.onBackground }}><Picker
-
+        <View className="overflow-hidden" style={{ borderRadius: 4, borderWidth: 1, borderColor: theme.colors.onBackground }}>
+          <Picker
             style={{ backgroundColor: theme.colors.background, color: theme.colors.onBackground }}
             dropdownIconColor={theme.colors.onBackground}
             dropdownIconRippleColor={theme.colors.onBackground}
-            selectedValue={fondi}
+            selectedValue={utente}
             onValueChange={(itemValue, itemIndex) => {
               if (itemIndex !== 0) {
-                setFondi(itemValue)
+                setUtente(itemValue)
               }
             }
 
             }>
-            {fondiList.map((item, index) => (
+            {spesantiList.map((item, index) => (
               index === 0 ? (
                 <Picker.Item className="bg-black" enabled={false} label={item.label} value={item.value} key={index} />
               ) : (
                 <Picker.Item label={item.label} value={item.value} key={index} />
               )
             ))}
-          </Picker></View></>)}
+          </Picker>
+        </View>
 
-          <View className="h-[12px]" />
 
-          <TextInput
+        {utente !== "gruppospeleo" && (<><View className="h-5" /><View className="overflow-hidden" style={{ borderRadius: 4, borderWidth: 1, borderColor: theme.colors.onBackground }}><Picker
+
+          style={{ backgroundColor: theme.colors.background, color: theme.colors.onBackground }}
+          dropdownIconColor={theme.colors.onBackground}
+          dropdownIconRippleColor={theme.colors.onBackground}
+          selectedValue={fondi}
+          onValueChange={(itemValue, itemIndex) => {
+            if (itemIndex !== 0) {
+              setFondi(itemValue)
+            }
+          }
+
+          }>
+          {fondiList.map((item, index) => (
+            index === 0 ? (
+              <Picker.Item className="bg-black" enabled={false} label={item.label} value={item.value} key={index} />
+            ) : (
+              <Picker.Item label={item.label} value={item.value} key={index} />
+            )
+          ))}
+        </Picker></View></>)}
+
+        <View className="h-[12px]" />
+
+        <TextInput
+          mode="outlined"
+          label={<Text style={{ color: theme.colors.onBackground }}>Descrizione</Text>}
+          placeholder="Che tipo di spesa era?"
+          onChangeText={descrizione => setDescrizione(descrizione)}
+          value={descrizione}
+          outlineColor={theme.colors.onBackground}
+          style={{ backgroundColor: theme.colors.background }}
+          placeholderTextColor={theme.colors.onBackground}
+          textColor={theme.colors.onBackground}
+          right={<TextInput.Icon icon="pen" color={theme.colors.onBackground} />}
+        />
+        <View className="h-5" />
+        <CurrencyInput
+          value={costo}
+          onChangeValue={setCosto}
+          renderTextInput={textInputProps => <TextInput {...textInputProps}
             mode="outlined"
-            label={<Text style={{ color: theme.colors.onBackground }}>Descrizione</Text>}
-            placeholder="Che tipo di spesa era?"
-            onChangeText={descrizione => setDescrizione(descrizione)}
-            value={descrizione}
             outlineColor={theme.colors.onBackground}
             style={{ backgroundColor: theme.colors.background }}
             placeholderTextColor={theme.colors.onBackground}
             textColor={theme.colors.onBackground}
-            right={<TextInput.Icon icon="pen" color={theme.colors.onBackground} />}
-          />
-          <View className="h-5" />
-          <CurrencyInput
-            value={costo}
-            onChangeValue={setCosto}
-            renderTextInput={textInputProps => <TextInput {...textInputProps}
-              mode="outlined"
-              outlineColor={theme.colors.onBackground}
-              style={{ backgroundColor: theme.colors.background }}
-              placeholderTextColor={theme.colors.onBackground}
-              textColor={theme.colors.onBackground}
-              right={<TextInput.Icon icon="cash" color={theme.colors.onBackground} />}
-            />}
-            renderText
-            prefix="€"
-            delimiter="."
-            separator=","
-            precision={2}
-          />
-          <View className="mb-3 mt-3" >
-            <View className="mb-3" style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-              {selectedImages.map((image, index) => (
-                <TouchableOpacity style={{ width: '20%', padding: 5 }} key={index} onPress={() => handleImagePress(index)}>
-                  <View >
-                    <Image source={{ uri: image }} style={{ width: '100%', aspectRatio: 1 }} />
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-
-
+            right={<TextInput.Icon icon="cash" color={theme.colors.onBackground} />}
+          />}
+          renderText
+          prefix="€"
+          delimiter="."
+          separator=","
+          precision={2}
+        />
+        <View className="mb-3 mt-3" >
+          <View className="mb-3" style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            {selectedImages.map((image, index) => (
+              <TouchableOpacity style={{ width: '20%', padding: 5 }} key={index} onPress={() => handleImagePress(index)}>
+                <View >
+                  <Image source={{ uri: image }} style={{ width: '100%', aspectRatio: 1 }} />
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
 
 
 
-        </SafeAreaView>
-        <SafeAreaView className="flex-1 p-10 justify-end">
-          <View className="flex flex-row mb-3 gap-2 ">
-            <View className="flex-1">
-              <View className="flex flex-col justify-center">
-                <Button mode='outlined' icon={"image-multiple-outline"} onPress={handleImagePicker} textColor={theme.colors.onBackground} style={{borderRadius: 3}}>
-                  Da galleria
-                </Button>
-              </View>
-            </View>
+        </View>
+
+
+
+      </SafeAreaView>
+      <SafeAreaView className="flex-1 p-10 justify-end">
+        <View className="flex flex-row mb-3 gap-2 ">
+          <View className="flex-1">
             <View className="flex flex-col justify-center">
-              <View className="">
-                <IconButton style={{borderRadius: 3}} size={26} className="m-0" icon={"camera"} mode='outlined' onPress={handleCameraOpen}  >
-                  Da fotocamera
-                </IconButton>
-              </View>
+              <Button mode='outlined' icon={"image-multiple-outline"} onPress={handleImagePicker} textColor={theme.colors.onBackground} style={{ borderRadius: 3 }}>
+                Da galleria
+              </Button>
             </View>
-
           </View>
-          <Button style={{borderRadius: 3}} textColor="black" mode="contained" loading={loadingAggiungi} icon={"plus"} onPress={() => {if(!loadingAggiungi){handleAggiungiClick()}}}>
-            Aggiungi
-          </Button>
-        </SafeAreaView>
-      </Surface>
+          <View className="flex flex-col justify-center">
+            <View className="">
+              <IconButton style={{ borderRadius: 3 }} size={26} className="m-0" icon={"camera"} mode='outlined' onPress={handleCameraOpen}  >
+                Da fotocamera
+              </IconButton>
+            </View>
+          </View>
+
+        </View>
+        <Button style={{ borderRadius: 3 }} textColor="black" mode="contained" loading={loadingAggiungi} icon={"plus"} onPress={() => { if (!loadingAggiungi) { handleAggiungiClick() } }}>
+          Aggiungi
+        </Button>
+      </SafeAreaView>
+    </Surface>
   )
 }

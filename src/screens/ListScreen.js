@@ -29,7 +29,7 @@ const ListScreen = () => {
         <View>
           <Text style={{ color: theme.colors.onBackground, fontWeight: "bold", fontSize: 20 }}>{item.spesante}</Text>
           <View className="flex flex-row">
-            <Text style={{ color: item.costo > 0 ? "red" : "green", fontWeight: "bold" }}>{item.costo}€</Text>
+            <Text style={{ color: item.quantità > 0 ? "red" : "green", fontWeight: "bold" }}>{item.quantità}€</Text>
             <Text style={{ color: theme.colors.onBackground }}> via {item.tipo_di_fondi_utilizzati}</Text>
           </View>
         </View>

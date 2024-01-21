@@ -9,6 +9,8 @@ import { ToastProvider } from 'react-native-toast-notifications'
 import { View, Text, useColorScheme } from 'react-native';
 import { useMaterial3Theme } from '@pchmn/expo-material3-theme';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { ca } from 'react-native-paper-dates';
 
 
 export default function App() {
@@ -22,6 +24,26 @@ export default function App() {
       : { ...MD3LightTheme, colors: theme.light };
 
   paperTheme.colors.primary = "#0089EB"
+
+  const [utenti, setUtenti] = useState([]);
+
+  const getUtenti = async () => {
+    const response = await fetch('https://appluca-backend.federicocervelli01.workers.dev/utenti');
+    const data = await response.json();
+    setUtenti(data);
+  }
+
+  useEffect( () => {
+    // Fetch data from your database
+    try{
+      getUtenti();
+      console.log(utenti);
+    } catch (error) {
+      console.log(error);
+    }
+    
+    
+  }, []);
 
 
   return (
@@ -70,7 +92,7 @@ export default function App() {
           )
         }}>
         <StatusBar style="auto" />
-        <AppNavigation />
+        <AppNavigation utenti={utenti} />
       </ToastProvider>
     </PaperProvider>
   );

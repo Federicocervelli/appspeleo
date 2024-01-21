@@ -18,7 +18,7 @@ const Stack = createStackNavigator()
 
 
 
-export default function AppNavigation() {
+const AppNavigation = ({utenti}) => {
   const { colorScheme, toggleColorScheme } = useColorScheme()
   const theme = useTheme();
   const TabNavigator = () => {
@@ -68,3 +68,5 @@ export default function AppNavigation() {
     </NavigationContainer>
   )
 }
+
+export default AppNavigation
